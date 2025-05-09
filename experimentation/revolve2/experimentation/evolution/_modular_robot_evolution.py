@@ -12,17 +12,15 @@ class ModularRobotEvolution(Evolution):
 
     _parent_selection: Selector
     _survivor_selection: Selector
-    _learner: Learner | None
-    _evaluator: Evaluator
+    _learner: Learner
     _reproducer: Reproducer
 
     def __init__(
         self,
         parent_selection: Selector,
         survivor_selection: Selector,
-        evaluator: Evaluator,
         reproducer: Reproducer,
-        learner: Learner | None = None,
+        learner: Learner,
     ) -> None:
         """
         Initialize the ModularRobotEvolution object to make robots evolve.
@@ -35,7 +33,6 @@ class ModularRobotEvolution(Evolution):
         """
         self._parent_selection = parent_selection
         self._survivor_selection = survivor_selection
-        self._evaluator = evaluator
         self._learner = learner
         self._reproducer = reproducer
 
@@ -45,13 +42,14 @@ class ModularRobotEvolution(Evolution):
 
         This implementation follows the following schedule:
 
-            [Parent Selection] ---------> [Reproduction]
+            [Parent Selection] ------------------> [Reproduction]
+            
+                    ^                                     |
+                    |                        [Learning (children only)]
+                    |                                     |
+                    |                                     ⌄
 
-                   ^                             |
-                   |                             |
-                   |                             ⌄
-
-            [Survivor Selection] <----- [Evaluation of Children]
+            [Survivor Selection] <----------- [Evaluation of Children]
 
         The schedule can be easily adapted and reorganized for your needs.
 
@@ -59,13 +57,12 @@ class ModularRobotEvolution(Evolution):
         :param kwargs: Additional keyword arguments to use in the step.
         :return: The population resulting from the step
         """
-        parents, parent_kwargs = self._parent_selection.select(population, **kwargs)
-        children = self._reproducer.reproduce(parents, **parent_kwargs)
-        child_task_performance = self._evaluator.evaluate(children)
-        survivors, *_ = self._survivor_selection.select(
-            population,
-            **kwargs,
+        parent_pairs = self._parent_selection.select(population)
+        children = self._reproducer.reproduce(parent_pairs, population)
+        children = self._learner.learn(children)
+        survivors = self._survivor_selection.select(
+            population=population,
             children=children,
-            child_task_performance=child_task_performance
         )
+        
         return survivors
