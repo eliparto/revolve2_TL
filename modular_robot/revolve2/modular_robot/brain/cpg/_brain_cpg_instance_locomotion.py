@@ -19,13 +19,18 @@ class BrainCpgInstanceLocomotion(BrainInstance):
     _initial_state: npt.NDArray[np.float_]  # Square matrix of cpg states
     _weight_tensor: npt.NDArray[np.float_]  # 3xnxn tensor matching number of neurons
     _output_mapping: list[tuple[int, ActiveHinge]]
+    _target: list[list[float]]
+    _nose: int # Frontal orientation of robot
 
     def __init__(
         self,
         initial_state: npt.NDArray[np.float_],
         weight_tensor: npt.NDArray[np.float_],
         output_mapping: list[tuple[int, ActiveHinge]],
+        targets:list[list[float]],
+        nose: int
     ) -> None:
+        # TODO: Functionality when a target is reached
         """
         Initialize this CPG Brain Instance.
 
@@ -36,13 +41,16 @@ class BrainCpgInstanceLocomotion(BrainInstance):
         #TODO: Determine if the weight matrices need their own initial states
         assert initial_state.ndim == 1
         assert weight_tensor.ndim == 3
-        assert weight_tensor.shape[1] == weight_matrix.shape[2]
-        assert initial_state.shape[0] == weight_matrix.shape[0]
+        assert weight_tensor.shape[1] == weight_tensor.shape[2]
+        assert initial_state.shape[0] == weight_tensor.shape[1]
         assert all([i >= 0 and i < len(initial_state) for i, _ in output_mapping])
+        assert nose >= 0
 
         self._state = initial_state
-        self._weight_matrix = weight_matrix
+        self._weight_tensor = weight_tensor
         self._output_mapping = output_mapping
+        self._targets = targets
+        self._nose = nose
 
     @staticmethod
     def _rk45(
@@ -67,15 +75,28 @@ class BrainCpgInstanceLocomotion(BrainInstance):
         state = state + dt / 6 * (A1 + 2 * (A2 + A3) + A4)
         return np.clip(state, a_min=-1, a_max=1)
     
-    def action(self) -> None:
-        pass
+    def action(self, data) -> None:
+        """
+        Calculate the angle to the target and determine which action to take.
+        """
+        # robot_pose = sensor_state._simulation_state.get_pose()
+        # robot_pos = np.array([robot_pose.position_x,
+        #                       robot_pose.position_y])
+        # robot_quat = robot_pose.orientation
+        
+        # print(robot_pos)
+        # print(robot_quat)
+        
+        return 0
 
     def control(
         self,
         dt: float,
         sensor_state: ModularRobotSensorState,
         control_interface: ModularRobotControlInterface,
+        data,
     ) -> None:
+        # TODO: Add data param to description.  Also in handles code.
         """
         Control the modular robot.
 
@@ -86,10 +107,11 @@ class BrainCpgInstanceLocomotion(BrainInstance):
         :param control_interface: Interface for controlling the robot.
         """
         # Choose the weight matrix for the requested movement
-        ...
+        idx = self.action(data)
+        weight_matrix = self._weight_tensor[idx]
         
         # Integrate ODE to obtain new state.
-        self._state = self._rk45(self._state, self._weight_matrix, dt)
+        self._state = self._rk45(self._state, weight_matrix, dt)
 
         # Set active hinge targets to match newly calculated state.
         for state_index, active_hinge in self._output_mapping:

@@ -51,7 +51,7 @@ def simulate_scene(
     :returns: The results of simulation. The number of returned states depends on `sample_step`.
     :raises ValueError: If the viewer is not able to record.
     """
-    logging.info(f"Simulating scene {scene_id}")
+    logging.debug(f"Simulating scene {scene_id}")
 
     """Define mujoco data and model objects for simuating."""
     model, mapping = scene_to_model(
@@ -153,11 +153,20 @@ def simulate_scene(
             simulation_state = SimulationStateImpl(
                 data=data, abstraction_to_mujoco_mapping=mapping, camera_views=images
             )
-            scene.handler.handle(simulation_state, control_interface, control_step)
+            # TODO: Inject position/quaternion data here!
+            # data.xpos -> third line
+            # CAUTION: Sensitive to time
+            # print("Simulate scene xpos:")
+            # print(simulation_state._xpos)
+            # print("quat:")
+            # print(simulation_state._qpos)
+            robot_data=data.copy()
+            scene.handler.handle(simulation_state, control_interface,
+                                 control_step, robot_data)
 
         # sample state if it is time
         if sample_step is not None:
-            if time >= last_sample_time + sample_step:
+            if time >= last_sample_time + sample_step:      
                 last_sample_time = int(time / sample_step) * sample_step
                 simulation_states.append(
                     SimulationStateImpl(
@@ -210,7 +219,7 @@ def simulate_scene(
         viewer.close_viewer()
 
     if record_settings is not None:
-        video.release()
+        video.release()  
 
     # Sample one final time.
     if sample_step is not None:
@@ -220,5 +229,5 @@ def simulate_scene(
             )
         )
 
-    logging.info(f"Scene {scene_id} done.")
+    logging.debug(f"Scene {scene_id} done.")
     return simulation_states

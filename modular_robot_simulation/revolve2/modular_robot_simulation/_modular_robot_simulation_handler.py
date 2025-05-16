@@ -37,6 +37,7 @@ class ModularRobotSimulationHandler(SimulationHandler):
         simulation_state: SimulationState,
         simulation_control: ControlInterface,
         dt: float,
+        robot_data,
     ) -> None:
         """
         Handle a simulation frame.
@@ -50,10 +51,12 @@ class ModularRobotSimulationHandler(SimulationHandler):
                 simulation_state=simulation_state,
                 body_to_multi_body_system_mapping=body_to_multi_body_system_mapping,
             )
+            # TODO: Test here
             control = ModularRobotControlInterfaceImpl(
                 simulation_control=simulation_control,
                 body_to_multi_body_system_mapping=body_to_multi_body_system_mapping,
             )
             brain_instance.control(
-                dt=dt, sensor_state=sensor_state, control_interface=control
+                dt=dt, sensor_state=sensor_state, control_interface=control,
+                data=robot_data,
             )

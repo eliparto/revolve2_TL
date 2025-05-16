@@ -23,24 +23,29 @@ class BrainCpgNetworkLocomotion(Brain):
     _initial_state: npt.NDArray[np.float_]
     _weight_tensor: npt.NDArray[np.float_]
     _output_mapping: list[tuple[int, ActiveHinge]]
+    _targets: list[list[float]]
 
     def __init__(
         self,
         initial_state: npt.NDArray[np.float_],
         weight_tensor: npt.NDArray[np.float_],
         output_mapping: list[tuple[int, ActiveHinge]],
+        targets: list[list[float]],
+        nose: int,
     ) -> None:
         """
         Initialize this object.
 
         :param initial_state: The initial state of the neural network.
         :param all_weights: Tensor containing the 3 two-dimensional weight matrices.
-        :param weight_matrix: The weight matrix used during integration.
         :param output_mapping: Marks neurons as controller outputs and map them to the correct active hinge.
+        :param targets: List of targets for the robot to reach
         """
         self._initial_state = initial_state
         self._weight_tensor = weight_tensor
         self._output_mapping = output_mapping
+        self._targets = targets
+        self._nose = nose
 
     @classmethod
     def uniform_from_params(
@@ -49,6 +54,8 @@ class BrainCpgNetworkLocomotion(Brain):
         cpg_network_structure: CpgNetworkStructure,
         initial_state_uniform: float,
         output_mapping: list[tuple[int, ActiveHinge]],
+        targets: list[list[float]],
+        nose: int,
         ) -> BrainCpgNetworkLocomotion:
         """
         Create and initialize an instance of this brain from the provided parameters, assuming uniform initial state.
@@ -76,6 +83,8 @@ class BrainCpgNetworkLocomotion(Brain):
             initial_state=initial_state,
             weight_tensor=weight_tensor,
             output_mapping=output_mapping,
+            targets=targets,
+            nose=nose,
         )
 
     def make_instance(self) -> BrainInstance:
@@ -88,4 +97,6 @@ class BrainCpgNetworkLocomotion(Brain):
             initial_state=self._initial_state,
             weight_tensor=self._weight_tensor,
             output_mapping=self._output_mapping,
+            targets=self._targets,
+            nose=self._nose,
         )

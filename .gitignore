@@ -141,3 +141,19 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 /standards/revolve2/standards/morphological_novelty_metric/_calculate_novelty.c
+experimentation/.DS_Store
+experimentation/revolve2/.DS_Store
+experimentation/revolve2/experimentation/.DS_Store
+experimentation/revolve2/experimentation/evolution/.DS_Store
+experimentation/revolve2/experimentation/optimization/.DS_Store
+modular_robot/.DS_Store
+modular_robot/revolve2/.DS_Store
+modular_robot/revolve2/modular_robot/.DS_Store
+modular_robot/revolve2/modular_robot/brain/.DS_Store
+modular_robot_simulation/.DS_Store
+modular_robot_simulation/revolve2/.DS_Store
+simulators/.DS_Store
+simulators/mujoco_simulator/.DS_Store
+simulators/mujoco_simulator/revolve2/.DS_Store
+simulators/mujoco_simulator/revolve2/simulators/.DS_Store
+.DS_Store
