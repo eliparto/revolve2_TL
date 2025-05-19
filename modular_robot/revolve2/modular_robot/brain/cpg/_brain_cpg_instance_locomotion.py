@@ -79,7 +79,7 @@ class BrainCpgInstanceLocomotion(BrainInstance):
     
     def quaternion_to_euler(self, q) -> tuple[float]:
         """
-        Convert quaterion data into angles about roll, pitch and yaw axes.
+        Convert quaterion data into angles about roll, pitch, and yaw axes.
         """
         w, x, y, z = q
         roll = np.arctan2(2*(w*x + y*z), 1 - 2*(x*x + y*y))
@@ -94,7 +94,7 @@ class BrainCpgInstanceLocomotion(BrainInstance):
         Calculate the angle to the target and determine which action to take.
         Returns index of the weight matrix to use.
         
-        :param data: Tuple containing robot's poition vector and orentational quaternion.
+        :param data: Tuple containing robot's position vector and orentational quaternion.
         :param targets: List of target coordinates
         """
         pos, quat = data
@@ -132,15 +132,15 @@ class BrainCpgInstanceLocomotion(BrainInstance):
         control_interface: ModularRobotControlInterface,
         data,
     ) -> None:
-        # TODO: Add data param to description.  Also in handles code.
         """
         Control the modular robot.
-
         Sets the active hinge targets to the values in the state array as defined by the mapping provided in the constructor.
-
+        TODO: Determine if each weight matrix needs its own state vector.
+        TODO: OR: Reset state array to initial state when switching (resets cpg amplitude, phase etc.).
         :param dt: Elapsed seconds since last call to this function.
         :param sensor_state: Interface for reading the current sensor state.
         :param control_interface: Interface for controlling the robot.
+        :param data: Tuple containing robot's position vector and orientational quaternion.
         """
         # Choose the weight matrix for the requested movement
         idx = self.action(data)
