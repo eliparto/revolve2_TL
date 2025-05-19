@@ -99,6 +99,23 @@ class Body:
         :returns: The created grid with cells set to either a Module or None and a position vector of the core. The position Vector3 is dtype: int.
         """
         return _GridMaker().make_grid(self)
+    
+    def to_grid_new(self):
+        g = _GridMaker()
+        return g.make_grid(self)
+    
+    def dims(self) -> list[int]:
+        """
+        Return the x, y, and z lengths of the bounding box.
+        Used since the shape of the `to_grid()` function does not seem to update correctly.
+        """
+        g = _GridMaker()
+        g.make_grid(self)
+        dx = min(g._x) + max(g._x)
+        dy = min(g._y) + max(g._y)
+        dz = min(g._z) + max(g._z)
+        
+        return np.array([dx, dy, dz])
 
     @property
     def core(self) -> Core:

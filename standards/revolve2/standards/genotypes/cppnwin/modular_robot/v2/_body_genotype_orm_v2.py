@@ -115,7 +115,6 @@ class BodyGenotypeOrmV2(orm.MappedAsDataclass, kw_only=True):
         """
         return develop(self.body)
 
-
 @event.listens_for(BodyGenotypeOrmV2, "before_update", propagate=True)
 @event.listens_for(BodyGenotypeOrmV2, "before_insert", propagate=True)
 def _update_serialized_body(

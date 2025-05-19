@@ -20,7 +20,6 @@ class __Module:
     chain_length: int
     module_reference: Module
 
-
 def develop(
     genotype: multineat.Genome,
     visualize: bool = False,  # Add a flag to control visualization

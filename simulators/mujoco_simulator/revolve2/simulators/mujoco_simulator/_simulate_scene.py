@@ -154,13 +154,9 @@ def simulate_scene(
                 data=data, abstraction_to_mujoco_mapping=mapping, camera_views=images
             )
             # TODO: Inject position/quaternion data here!
-            # data.xpos -> third line
-            # CAUTION: Sensitive to time
-            # print("Simulate scene xpos:")
-            # print(simulation_state._xpos)
-            # print("quat:")
-            # print(simulation_state._qpos)
-            robot_data=data.copy()
+            robot_data = (
+                simulation_state._xpos[2], simulation_state._xquat[2]
+                )
             scene.handler.handle(simulation_state, control_interface,
                                  control_step, robot_data)
 

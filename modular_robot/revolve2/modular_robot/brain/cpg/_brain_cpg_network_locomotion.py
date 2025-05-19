@@ -65,7 +65,7 @@ class BrainCpgNetworkLocomotion(Brain):
         :param initial_state_uniform: Initial state to use for all neurons.
         :param output_mapping: Marks neurons as controller outputs and map them to the correct active hinge.
         :returns: The created brain.
-        """
+        """        
         initial_state = cpg_network_structure.make_uniform_state(initial_state_uniform)
         params = np.reshape(params, (3, int(len(params)/3)))
         weight_tensor = np.zeros((3, 2*cpg_network_structure.num_cpgs,
@@ -78,7 +78,7 @@ class BrainCpgNetworkLocomotion(Brain):
                     list(params[i]))
                 )
             weight_tensor[i] = weight_matrix
-        
+                    
         return BrainCpgNetworkLocomotion(
             initial_state=initial_state,
             weight_tensor=weight_tensor,

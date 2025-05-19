@@ -45,6 +45,7 @@ class ModularRobotSimulationHandler(SimulationHandler):
         :param simulation_state: The current state of the simulation.
         :param simulation_control: Interface for setting control targets.
         :param dt: The time since the last call to this function.
+        :param robot_data: Tuple containing positional vector and orientational quaternion.
         """
         for brain_instance, body_to_multi_body_system_mapping in self._brains:
             sensor_state = ModularRobotSensorStateImpl(

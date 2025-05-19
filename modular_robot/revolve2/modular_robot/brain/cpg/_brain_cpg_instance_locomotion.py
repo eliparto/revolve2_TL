@@ -51,6 +51,8 @@ class BrainCpgInstanceLocomotion(BrainInstance):
         self._output_mapping = output_mapping
         self._targets = targets
         self._nose = nose
+        self._alpha = np.deg2rad(10) # 'vision' cone in which we try to get the target
+        self._threshold = 0.25 # Distance at which robot is deemed to have reached a target
 
     @staticmethod
     def _rk45(
@@ -75,19 +77,53 @@ class BrainCpgInstanceLocomotion(BrainInstance):
         state = state + dt / 6 * (A1 + 2 * (A2 + A3) + A4)
         return np.clip(state, a_min=-1, a_max=1)
     
-    def action(self, data) -> None:
+    def quaternion_to_euler(self, q) -> tuple[float]:
+        """
+        Convert quaterion data into angles about roll, pitch and yaw axes.
+        """
+        w, x, y, z = q
+        roll = np.arctan2(2*(w*x + y*z), 1 - 2*(x*x + y*y))
+        pitch = np.arcsin(2*(w*y - z*x))
+        yaw = np.arctan2(2*(w*z + x*y), 1 - 2*(y*y + z*z))
+    
+        return roll, pitch, yaw  # Angles in radians
+    
+    def action(
+            self, data) -> None:
         """
         Calculate the angle to the target and determine which action to take.
+        Returns index of the weight matrix to use.
+        
+        :param data: Tuple containing robot's poition vector and orentational quaternion.
+        :param targets: List of target coordinates
         """
-        # robot_pose = sensor_state._simulation_state.get_pose()
-        # robot_pos = np.array([robot_pose.position_x,
-        #                       robot_pose.position_y])
-        # robot_quat = robot_pose.orientation
+        pos, quat = data
+        pos = np.array(pos)[:2] # Ignore z-axis
+        target = self._targets[0]
         
-        # print(robot_pos)
-        # print(robot_quat)
+        vect_toTarget = target - pos
+        if np.linalg.norm(vect_toTarget) < self._threshold: # Check if robot has reached a target
+            targets = target[1:] # Pop target
+            vect_toTarget = target - pos
+            
+        angle_robot_toTarget = np.arctan2(vect_toTarget[0], vect_toTarget[1]) # Angle from robot to target w.r.t. world coordinates
+        _, _, angle_robot_toWorld = self.quaternion_to_euler(quat) # Robot's yaw angle w.r.t. world coordinates
         
-        return 0
+        # Adjust orientation depending on nose orientation
+        match self._nose:
+            case 0:
+                angle_robot_toWorld -= (0.5 * np.pi)
+            case 2:
+                angle_robot_toWorld += (0.5 * np.pi)
+            case 3: 
+                angle_robot_toWorld += np.pi
+
+        if (abs(angle_robot_toWorld) + self._alpha) < abs(angle_robot_toWorld): # If robot's orientation 
+            return 0 # Move forward
+        
+        else:
+            if angle_robot_toWorld > angle_robot_toTarget: return 1
+            else: return 2
 
     def control(
         self,

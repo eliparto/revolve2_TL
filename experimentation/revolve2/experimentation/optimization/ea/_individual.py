@@ -43,10 +43,9 @@ class Individual(HasId, orm.MappedAsDataclass, Generic[TGenotype]):
         genotype: orm.Mapped[TGenotype] = orm.relationship()
         
         # Added functionalities
-        beta: orm.Mapped[float] = orm.mapped_column(nullable=False)
+        nose: orm.Mapped[int] = orm.mapped_column(nullable=False)
         fitness: orm.Mapped[float] = orm.mapped_column(nullable=False) # Total fitness
-        fitnesses: orm.Mapped[list[float]] = orm.mapped_column(JSON, nullable = False) # Vector of action fitnesses 
-        solutions: orm.Mapped[list[float]] = orm.mapped_column(JSON, nullable = False) # Flattened vector of solution vectors
+        solutions: orm.Mapped[list[float]] = orm.mapped_column(JSON, nullable = False) # Flattened solution vectors
 
     # ----------------------
     # Implementation details
@@ -70,19 +69,15 @@ class Individual(HasId, orm.MappedAsDataclass, Generic[TGenotype]):
             return cls.__genotype_impl()
         
         # Added calls
-        # Natural orientation beta call
+        # Robot's `nose` orientation
         @orm.declared_attr
-        def beta(cls) -> orm.Mapped[float]:  # noqa
-            return cls.__beta_impl()
+        def nose(cls) -> orm.Mapped[int]:  # noqa
+            return cls.__nose_impl()
         
-        # Fitness value/vector calls
+        # Fitness value
         @orm.declared_attr
         def fitness(cls) -> orm.Mapped[float]:  # noqa
             return cls.__fitness_impl()
-
-        @orm.declared_attr
-        def fitnesses(cls) -> orm.Mapped[list[float]]:  # noqa
-            return cls.__fitnesses_impl()
         
         # Solution vector call
         @orm.declared_attr
@@ -144,17 +139,13 @@ class Individual(HasId, orm.MappedAsDataclass, Generic[TGenotype]):
     # Added functionalities
     # Natural orientation beta
     @classmethod
-    def __beta_impl(cls) -> orm.Mapped[float]:
+    def __nose_impl(cls) -> orm.Mapped[int]:
         return orm.mapped_column(nullable=False)
     
     # Fitnesses
     @classmethod
     def __fitness_impl(cls) -> orm.Mapped[float]:
         return orm.mapped_column(nullable=False)
-
-    @classmethod
-    def __fitnesses_impl(cls) -> orm.Mapped[list[float]]:
-        return orm.mapped_column(JSON, nullable=False)
 
     # Solutions    
     @classmethod
