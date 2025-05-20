@@ -31,7 +31,7 @@ class Evaluator(Eval):
         :param num_simulators: `num_simulators` parameter for the physics simulator.
         """
         self._simulator = LocalSimulator(
-            headless=headless, num_simulators=num_simulators
+            headless=headless, num_simulators=num_simulators, viewer_type="native"
         )
         self._terrain = terrains.flat()
 
@@ -56,9 +56,11 @@ class Evaluator(Eval):
             scenes.append(scene)
 
         # Simulate all scenes.
+        batch_parameters = make_standard_batch_parameters()
+        #batch_parameters.simulation_time = None
         scene_states = simulate_scenes(
             simulator=self._simulator,
-            batch_parameters=make_standard_batch_parameters(),
+            batch_parameters=batch_parameters,
             scenes=scenes,
         )
 

@@ -2,6 +2,7 @@
 
 from genotype import Genotype
 
+import math
 from revolve2.experimentation.evolution.abstract_elements import Evaluator as Eval
 from revolve2.modular_robot_simulation import (
     ModularRobotScene,

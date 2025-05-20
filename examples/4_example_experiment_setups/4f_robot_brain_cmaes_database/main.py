@@ -64,12 +64,17 @@ def run_experiment(dbengine: Engine) -> None:
     )
 
     # Initial parameter values for the brain.
+    # [0.5, 0.5, ... , 0.5]
+    # TODO: We can "inject" the old weights here
     initial_mean = cpg_network_structure.num_connections * [0.5]
 
     # Initialize the cma optimizer.
     options = cma.CMAOptions()
     options.set("bounds", [-1.0, 1.0])
     options.set("seed", rng_seed)
+    # Population size defined in here:
+    # TODO Check pop. size -> see if we can change
+    # options.set("popsize", n)
     opt = cma.CMAEvolutionStrategy(initial_mean, config.INITIAL_STD, options)
 
     # Run cma for the defined number of generations.
@@ -79,6 +84,8 @@ def run_experiment(dbengine: Engine) -> None:
 
         # Get the sampled solutions(parameters) from cma.
         solutions = opt.ask()
+        #logging.info("\n## Solutions: ##\n")
+        #logging.info(solutions.shape)
 
         # Evaluate them.
         fitnesses = evaluator.evaluate(solutions)
@@ -94,6 +101,10 @@ def run_experiment(dbengine: Engine) -> None:
                 for parameters, fitness in zip(solutions, fitnesses)
             ]
         )
+        
+        logging.info("\n\nPopulation information:")
+        logging.info(population)
+        logging.info("#####################\n")
 
         # Make it all into a generation and save it to the database.
         generation = Generation(

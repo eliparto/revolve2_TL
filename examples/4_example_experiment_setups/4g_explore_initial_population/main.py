@@ -3,6 +3,7 @@
 import logging
 import random
 
+import math
 import config
 import multineat
 import numpy as np
@@ -148,7 +149,7 @@ def main() -> None:
 
     # Create the robot bodies from the genotypes of the population
     robots = [
-        individual.genotype.develop(config.VISUALIZE_MAP) for individual in population
+        individual.genotype.develop(True) for individual in population
     ]
 
     # Calculate the morphological features for each robot in the population
@@ -176,7 +177,7 @@ def main() -> None:
         i += 1
 
     # Declare the simulators and simulation parameters.
-    simulator = LocalSimulator(viewer_type="custom", headless=False)
+    simulator = LocalSimulator(viewer_type="native", headless=False)
     batch_parameters = make_standard_batch_parameters()
     batch_parameters.simulation_time = 1000
     batch_parameters.simulation_timestep = 0.01

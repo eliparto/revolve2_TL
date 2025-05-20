@@ -1,6 +1,6 @@
 from typing import Any
 
-from .abstract_elements import Evaluator, Evolution, Learner, Reproducer, Selector
+from .abstract_elements import Evaluator, Evolution, Learner, Reproducer, Selector, Morpho
 
 TPopulation = (
     Any  # An alias for Any signifying that a population can vary depending on use-case.
@@ -14,6 +14,7 @@ class ModularRobotEvolution(Evolution):
     _survivor_selection: Selector
     _learner: Learner
     _reproducer: Reproducer
+    _morpho: Morpho
 
     def __init__(
         self,
@@ -21,6 +22,7 @@ class ModularRobotEvolution(Evolution):
         survivor_selection: Selector,
         reproducer: Reproducer,
         learner: Learner,
+        morpho: Morpho,
     ) -> None:
         """
         Initialize the ModularRobotEvolution object to make robots evolve.
@@ -35,6 +37,7 @@ class ModularRobotEvolution(Evolution):
         self._survivor_selection = survivor_selection
         self._learner = learner
         self._reproducer = reproducer
+        self._morpho = morpho
 
     def step(self, population: TPopulation, **kwargs: Any) -> TPopulation:
         """
@@ -59,6 +62,7 @@ class ModularRobotEvolution(Evolution):
         """
         parent_pairs = self._parent_selection.select(population)
         children = self._reproducer.reproduce(parent_pairs, population)
+        children = self._morpho.findNose(children)
         children = self._learner.learn(children)
         survivors = self._survivor_selection.select(
             population=population,

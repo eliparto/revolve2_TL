@@ -238,12 +238,24 @@ def main() -> None:
     # Evaluate the initial population.
     logging.info("Evaluating initial population.")
     initial_fitnesses = evaluator.evaluate(initial_genotypes)
+    
+    # TODO: Debug
+    logging.info("\n###\n genotype")
+    logging.info(initial_genotypes)
+    logging.info("\n###\n fitnisses")
+    logging.info(initial_fitnesses)
+    logging.info("\n###\n")
 
     # Create a population of individuals, combining genotype with fitness.
     population = [
         Individual(genotype, fitness)
         for genotype, fitness in zip(initial_genotypes, initial_fitnesses, strict=True)
     ]
+
+    # TODO Debug
+    logging.info("\n###\n population at index 0")
+    logging.info(population[0])
+    logging.info("\n###\n")
 
     # Save the best robot
     best_robot = find_best_robot(None, population)

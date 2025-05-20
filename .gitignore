@@ -186,3 +186,4 @@ examples/4_example_experiment_setups/4f_robot_brain_cmaes_database/main.py
 examples/4_example_experiment_setups/4g_explore_initial_population/evaluator.py
 examples/4_example_experiment_setups/4g_explore_initial_population/main.py
 standards/revolve2/standards/planar_robot_representation.py
+*.py

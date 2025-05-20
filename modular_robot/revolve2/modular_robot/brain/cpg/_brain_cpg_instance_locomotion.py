@@ -19,7 +19,7 @@ class BrainCpgInstanceLocomotion(BrainInstance):
     _initial_state: npt.NDArray[np.float_]  # Square matrix of cpg states
     _weight_tensor: npt.NDArray[np.float_]  # 3xnxn tensor matching number of neurons
     _output_mapping: list[tuple[int, ActiveHinge]]
-    _target: list[list[float]]
+    _targets: npt.NDArray[np.float_] # List of target coordinates
     _nose: int # Frontal orientation of robot
 
     def __init__(
@@ -27,7 +27,7 @@ class BrainCpgInstanceLocomotion(BrainInstance):
         initial_state: npt.NDArray[np.float_],
         weight_tensor: npt.NDArray[np.float_],
         output_mapping: list[tuple[int, ActiveHinge]],
-        targets:list[list[float]],
+        targets:npt.NDArray[np.float_],
         nose: int
     ) -> None:
         # TODO: Functionality when a target is reached
@@ -99,11 +99,14 @@ class BrainCpgInstanceLocomotion(BrainInstance):
         """
         pos, quat = data
         pos = np.array(pos)[:2] # Ignore z-axis
-        target = self._targets[0]
+        target = self._targets[0] # TODO: Add exception for when all targets reached (tgt=[inf, inf])
+        print(f"target: {target}")
+        print(f"pos:    {pos}")
         
         vect_toTarget = target - pos
         if np.linalg.norm(vect_toTarget) < self._threshold: # Check if robot has reached a target
-            targets = target[1:] # Pop target
+            self.targets = self.targets[1:] # Pop reached target from stack
+            target = self.targets[0] # TODO: Unnecessary reinstatement -> check dist to target first
             vect_toTarget = target - pos
             
         angle_robot_toTarget = np.arctan2(vect_toTarget[0], vect_toTarget[1]) # Angle from robot to target w.r.t. world coordinates
@@ -118,10 +121,10 @@ class BrainCpgInstanceLocomotion(BrainInstance):
             case 3: 
                 angle_robot_toWorld += np.pi
 
-        if (abs(angle_robot_toWorld) + self._alpha) < abs(angle_robot_toWorld): # If robot's orientation 
+        if (abs(angle_robot_toWorld) + self._alpha) < abs(angle_robot_toWorld): # If target is within 'vision cone'
             return 0 # Move forward
         
-        else:
+        else: # Turn left or right
             if angle_robot_toWorld > angle_robot_toTarget: return 1
             else: return 2
 

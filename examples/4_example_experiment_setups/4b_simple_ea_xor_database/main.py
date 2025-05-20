@@ -140,24 +140,57 @@ class CrossoverReproducer(Reproducer):
         :returns: The reproduced population.
         :raises KeyError: If the parents are not passed.
         """
+        
+        # Debug
+        print("Debug pop:")
+        print(type(population))
+        print("###########")
+        print(population.shape)
+        print("###########")
+        print(population)
+        print("###########")
+
+        
         parents: list[Individual] | None = kwargs.get(
             "parent_population"
         )  # We select the population of parents that were passed in KWArgs of the parent selector object.
         if parents is None:
             raise KeyError("No children passed.")
-        offspring = [
-            Genotype.crossover(
+            
+        print("Debug par:")
+        print(parents)
+        print("###########")
+        print(type(parents))
+        print("###########")
+        
+        
+        offspring = []
+        for parent1_i, parent2_i in population:
+            temp = Genotype.crossover(
                 parents[parent1_i].genotype,
                 parents[parent2_i].genotype,
                 self._rng,
                 num_parameters=config.NUM_PARAMETERS,
-            ).mutate(
-                self._rng,
-                mutate_std=config.MUTATE_STD,
-                num_parameters=config.NUM_PARAMETERS,
-            )
-            for parent1_i, parent2_i in population
-        ]
+                ).mutate(
+                    self._rng,
+                    mutate_std=config.MUTATE_STD,
+                    num_parameters=config.NUM_PARAMETERS,
+                )
+            offspring.append(temp)
+            
+        # offspring = [
+        #     Genotype.crossover(
+        #         parents[parent1_i].genotype,
+        #         parents[parent2_i].genotype,
+        #         self._rng,
+        #         num_parameters=config.NUM_PARAMETERS,
+        #     ).mutate(
+        #         self._rng,
+        #         mutate_std=config.MUTATE_STD,
+        #         num_parameters=config.NUM_PARAMETERS,
+        #     )
+        #     for parent1_i, parent2_i in population
+        # ]
         return offspring
 
 

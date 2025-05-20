@@ -37,7 +37,14 @@ def draw_robots(
     :param path: The path for the output files.
     """
     if not path:
-        path = __mk_path()
+        raise Exception("No folder name given.")
+        
+    try:
+        os.rmdir(path)
+    except:
+        pass
+    
+    os.mkdir(path)
 
     for robot in robots:
         draw_robot(robot, scale, path)
@@ -57,9 +64,6 @@ def draw_robot(
     :param scale: Allows to set the size of the drawing.
     :param path: The path to save images to.
     """
-    if not path:
-        path = __mk_path()
-
     body = robot if isinstance(robot, Body) else robot.body
     tpl: tuple[NDArray[Any], Vector3[np.int_]] = body.to_grid()
     body_grid, core_position = tpl
@@ -111,10 +115,10 @@ def _draw_module(
                 context.set_source_rgb(1.0, 0.4, 0.4)  # Flesh Color
         case Brick():
             context.set_source_rgb(0, 0, 1)  # Blue
-        case _:
-            raise Exception(
-                f"Module of type {type(module)} has no defined structure for drawing."
-            )
+        # case _:
+            # raise Exception(
+            #     f"Module of type {type(module)} has no defined structure for drawing."
+            # )
 
     # default operation for every module
     context.fill_preserve()

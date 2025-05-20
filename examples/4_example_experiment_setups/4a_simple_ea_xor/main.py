@@ -152,7 +152,7 @@ class CrossoverReproducer(Reproducer):
 def main() -> None:
     """Run the program."""
     # Set up logging.
-    setup_logging()
+    setup_logging(file_name="log.txt")
     rng = make_rng_time_seed()
 
     # Create an initial population.
