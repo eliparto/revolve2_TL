@@ -60,11 +60,11 @@ class ModularRobotEvolution(Evolution):
         :param kwargs: Additional keyword arguments to use in the step.
         :return: The population resulting from the step
         """
-        parent_pairs = self._parent_selection.select(population)
-        children = self._reproducer.reproduce(parent_pairs, population)
-        children = self._morpho.findNose(children)
-        children = self._learner.learn(children)
-        survivors = self._survivor_selection.select(
+        parent_pairs = self._parent_selection.select(population)        # Generate parent pairs (parents have already learned)
+        children = self._reproducer.reproduce(parent_pairs, population) # Parents reproduce and make children
+        children = self._morpho.findNose(children)                      # Find frontal orientation of children
+        children = self._learner.learn(children)                        # Put children through learning process
+        survivors = self._survivor_selection.select(                    # Find survivors for the next generation
             population=population,
             children=children,
         )

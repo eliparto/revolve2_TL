@@ -100,13 +100,11 @@ class BrainCpgInstanceLocomotion(BrainInstance):
         pos, quat = data
         pos = np.array(pos)[:2] # Ignore z-axis
         target = self._targets[0] # TODO: Add exception for when all targets reached (tgt=[inf, inf])
-        print(f"target: {target}")
-        print(f"pos:    {pos}")
         
         vect_toTarget = target - pos
         if np.linalg.norm(vect_toTarget) < self._threshold: # Check if robot has reached a target
-            self.targets = self.targets[1:] # Pop reached target from stack
-            target = self.targets[0] # TODO: Unnecessary reinstatement -> check dist to target first
+            self._targets = self._targets[1:] # Pop reached target from stack
+            target = self._targets[0] # TODO: Unnecessary reinstatement -> check dist to target first
             vect_toTarget = target - pos
             
         angle_robot_toTarget = np.arctan2(vect_toTarget[0], vect_toTarget[1]) # Angle from robot to target w.r.t. world coordinates
