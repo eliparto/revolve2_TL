@@ -51,6 +51,7 @@ class BrainCpgInstanceLocomotionNewstate(BrainInstance):
         self._weight_tensor = weight_tensor
         self._output_mapping = output_mapping
         self._targets = targets
+        self._curr_target = self._targets[0]
         self._nose = nose
         self._alpha = np.deg2rad(10) # 'vision' cone in which we try to get the target
         self._threshold = 0.5*2**0.5 # Distance at which robot is deemed to have reached a target
@@ -101,13 +102,15 @@ class BrainCpgInstanceLocomotionNewstate(BrainInstance):
         """
         pos, quat = data
         pos = np.array(pos)[:2] # Ignore z-axis
-        target = self._targets[0] # TODO: Add exception for when all targets reached (tgt=[inf, inf])
-        
-        vect_toTarget = target - pos
+        vect_toTarget = self._curr_target - pos
+
         if np.linalg.norm(vect_toTarget) < self._threshold: # Check if robot has reached a target
-            self._targets = self._targets[1:] # Pop reached target from stack
-            target = self._targets[0] # TODO: Unnecessary reinstatement -> check dist to target first
-            vect_toTarget = target - pos
+            try: # Targets left to pop
+                self._targets = self._targets[1:] # Pop reached target from stack
+                self._curr_target = self._targets[0] # Update target
+            except: # No targets left -> generate far-away target
+                self._curr_target = np.array([1000.0, 1000.0])
+            vect_toTarget = self._curr_target - pos
             
         angle_robot_toTarget = np.arctan2(vect_toTarget[0], vect_toTarget[1]) # Angle from robot to target w.r.t. world coordinates
         _, _, angle_robot_toWorld = self.quaternion_to_euler(quat) # Robot's yaw angle w.r.t. world coordinates
