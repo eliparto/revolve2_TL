@@ -46,6 +46,8 @@ class Individual(HasId, orm.MappedAsDataclass, Generic[TGenotype]):
         nose: orm.Mapped[int] = orm.mapped_column(nullable=False)
         fitness: orm.Mapped[float] = orm.mapped_column(nullable=False) # Total fitness
         solutions: orm.Mapped[list[float]] = orm.mapped_column(JSON, nullable = False) # Flattened solution vectors
+        # Learning delta implementation
+        fitness_start: orm.Mapped[float] = orm.mapped_column(nullable=False)
 
     # ----------------------
     # Implementation details
@@ -77,6 +79,11 @@ class Individual(HasId, orm.MappedAsDataclass, Generic[TGenotype]):
         # Fitness value
         @orm.declared_attr
         def fitness(cls) -> orm.Mapped[float]:  # noqa
+            return cls.__fitness_impl()
+        
+        # Fitness value (pre-learning)
+        @orm.declared_attr
+        def fitness_start(cls) -> orm.Mapped[float]:  # noqa
             return cls.__fitness_impl()
         
         # Solution vector call
@@ -145,6 +152,11 @@ class Individual(HasId, orm.MappedAsDataclass, Generic[TGenotype]):
     # Fitnesses
     @classmethod
     def __fitness_impl(cls) -> orm.Mapped[float]:
+        return orm.mapped_column(nullable=False)
+    
+    # Fitnesses (pre-learning)
+    @classmethod
+    def __fitness_start_impl(cls) -> orm.Mapped[float]:
         return orm.mapped_column(nullable=False)
 
     # Solutions    
